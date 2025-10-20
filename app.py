@@ -1,0 +1,229 @@
+from flask import Flask, render_template, request, session, make_response
+import joblib
+import numpy as np
+from chatterbot import ChatBot
+from chatterbot.trainers import ChatterBotCorpusTrainer
+from xhtml2pdf import pisa
+from io import BytesIO
+
+app = Flask(__name__)
+app.secret_key = "my_super_secret_key"
+
+# Load trained ML model and scaler
+model = joblib.load("schiz_model.pkl")
+scaler = joblib.load("scaler.pkl")
+
+# Initialize ChatterBot
+schizo_bot = ChatBot("SchizoBot")
+trainer = ChatterBotCorpusTrainer(schizo_bot)
+trainer.train("chatterbot.corpus.english")
+
+# ----------------
+# Home Page
+# ----------------
+@app.route("/")
+def home():
+    return render_template("index.html")
+
+# ----------------
+# About Page
+# ----------------
+@app.route("/about")
+def about():
+    return render_template("about.html")
+
+# ----------------
+# Prediction Page
+# ----------------
+@app.route("/predict", methods=["GET", "POST"])
+def predict():
+    prediction = None
+    if request.method == "POST":
+        try:
+            age = float(request.form["age"])
+            yrschool = int(request.form["yrschool"])
+            gender = int(request.form["gender"])
+            q1 = float(request.form["q1"])
+            q2 = float(request.form["q2"])
+            q3 = float(request.form["q3"])
+            q4 = float(request.form["q4"])
+
+            features = np.array([[age, yrschool, gender, q1, q2, q3, q4]])
+            features_scaled = scaler.transform(features)
+            pred = model.predict(features_scaled)[0]
+            prediction = "Schizophrenia" if pred == 1 else "Sibling (no schizophrenia)"
+            session["prediction"] = prediction
+        except Exception as e:
+            prediction = f"Error: {str(e)}"
+
+    return render_template("predict.html", prediction=prediction)
+
+# ----------------
+# Chatbot Page
+# ----------------
+@app.route("/chatbot", methods=["GET", "POST"])
+def chatbot():
+    if request.method == "GET":
+        session["chat_history"] = []
+        session["mood"] = "neutral"
+
+    if "chat_history" not in session:
+        session["chat_history"] = []
+
+    mood = session.get("mood", "neutral")
+
+    if request.method == "POST":
+        if "mood" in request.form:
+            mood = request.form["mood"]
+            session["mood"] = mood
+        else:
+            user_input = request.form["message"]
+            bot_response = schizo_bot.get_response(user_input)
+            session["chat_history"].append(("You", user_input))
+            session["chat_history"].append(("Bot", str(bot_response)))
+            session.modified = True
+
+    return render_template("chatbot.html", history=session["chat_history"], mood=mood)
+
+# ----------------
+# Journal Page
+# ----------------
+@app.route("/journal", methods=["GET", "POST"])
+def journal():
+    if "journal" not in session:
+        session["journal"] = []
+
+    if request.method == "POST":
+        entry = request.form["entry"]
+        if entry.strip():
+            session["journal"].append(entry.strip())
+            session.modified = True
+
+    return render_template("journal.html", entries=session["journal"])
+
+# ----------------
+# Session PDF Download
+# ----------------
+@app.route("/session/download")
+def download_session():
+    journal = session.get("journal", [])
+    chat_history = session.get("chat_history", [])
+    prediction = session.get("prediction", "No prediction made yet")
+
+    html = render_template(
+        "session_pdf.html",
+        journal=journal,
+        chat_history=chat_history,
+        prediction=prediction
+    )
+
+    pdf = BytesIO()
+    pisa_status = pisa.CreatePDF(html, dest=pdf)
+
+    if pisa_status.err:
+        return "Error generating PDF", 500
+
+    response = make_response(pdf.getvalue())
+    response.headers["Content-Type"] = "application/pdf"
+    response.headers["Content-Disposition"] = "attachment; filename=session_report.pdf"
+    return response
+
+# ----------------
+# Run the app
+# ----------------
+if __name__ == "__main__":
+    import os
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=False)
+
+
+
+# from flask import Flask, render_template, request, session
+
+# import joblib
+# import numpy as np
+# from chatterbot import ChatBot
+# from chatterbot.trainers import ChatterBotCorpusTrainer
+
+
+# app = Flask(__name__)
+# app.secret_key = "your_secret_key"  # needed for session
+
+# model = joblib.load("schiz_model.pkl")
+# scaler = joblib.load("scaler.pkl")
+
+# @app.route("/")
+# def home():
+#     return render_template("index.html")
+
+# @app.route("/about")
+# def about():
+#     return render_template("about.html")
+
+# @app.route("/predict", methods=["GET", "POST"])
+# def predict():
+#     prediction = None
+#     if request.method == "POST":
+#         try:
+#             age = float(request.form["age"])
+#             yrschool = int(request.form["yrschool"])
+#             gender = int(request.form["gender"])
+#             saps7 = float(request.form["saps7"])
+#             saps20 = float(request.form["saps20"])
+#             saps25 = float(request.form["saps25"])
+#             saps34 = float(request.form["saps34"])
+
+#             features = np.array([[age, yrschool, gender, saps7, saps20, saps25, saps34]])
+#             features_scaled = scaler.transform(features)
+
+#             pred = model.predict(features_scaled)[0]
+#             prediction = "Schizophrenia" if pred == 1 else "Sibling (no schizophrenia)"
+#         except Exception as e:
+#             prediction = f"Error: {str(e)}"
+#     return render_template("predict.html", prediction=prediction)
+
+
+# schizo_bot = ChatBot("SchizoBot")
+# trainer = ChatterBotCorpusTrainer(schizo_bot)
+# trainer.train("chatterbot.corpus.english") 
+
+# @app.route("/chatbot", methods=["GET", "POST"])
+# def chatbot():
+#     if request.method == "GET":
+#         session["history"] = []    # reset chat history when user reopens
+#         session["mood"] = "neutral"  # optional: reset mood if you want
+
+#     if "history" not in session:
+#         session["history"] = []
+
+#     mood = session.get("mood", "neutral")
+
+#     if request.method == "POST":
+#         if "mood" in request.form:
+#             mood = request.form["mood"]
+#             session["mood"] = mood
+#         else:
+#             user_input = request.form["message"]
+#             bot_response = schizo_bot.get_response(user_input)
+#             session["history"].append(("You", user_input))
+#             session["history"].append(("Bot", str(bot_response)))
+#             session.modified = True
+
+#     return render_template("chatbot.html", history=session.get("history", []), mood=mood)
+
+
+
+# # in-memory journal storage
+# journal_entries = []
+
+# @app.route("/journal", methods=["GET", "POST"])
+# def journal():
+#     if request.method == "POST":
+#         entry = request.form["entry"]
+#         if entry.strip():
+#             journal_entries.append(entry.strip())
+#     return render_template("journal.html", entries=journal_entries)
+
+
+# if __name__ == "__main__":
+#     app.run(debug=True)

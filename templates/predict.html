@@ -1,0 +1,85 @@
+{% extends "layout.html" %}
+{% block title %}Clinical Assessment - MindCare{% endblock %}
+{% block content %}
+<div class="predict-container">
+  <div style="text-align: center; margin-bottom: 40px;">
+    <h2 style="color: #374151; font-weight: 600; margin-bottom: 16px;">🧠 Clinical Assessment</h2>
+    <p style="color: #6b7280; font-size: 1.1rem; max-width: 600px; margin: 0 auto; line-height: 1.6;">
+      This assessment uses validated clinical scales (SAPS) to provide insights. Please answer honestly - all information is confidential.
+    </p>
+  </div>
+  
+  <form action="/predict" method="post" class="predict-form">
+    <div class="form-section" style="margin-bottom: 32px;">
+      <h3 style="color: #374151; margin-bottom: 20px; font-weight: 600;">📋 Basic Information</h3>
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="age">Age (years)</label>
+          <input type="number" name="age" step="0.1" required placeholder="e.g., 25">
+        </div>
+        
+        <div class="form-group">
+          <label for="yrschool">Years of Education</label>
+          <input type="number" name="yrschool" required placeholder="e.g., 12">
+        </div>
+        
+        <div class="form-group">
+          <label for="gender">Gender</label>
+          <select name="gender" required>
+            <option value="">Select gender</option>
+            <option value="0">Male</option>
+            <option value="1">Female</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h3 style="color: #374151; margin-bottom: 20px; font-weight: 600;">🔍 Clinical Assessment (SAPS Scale)</h3>
+      <p style="color: #6b7280; margin-bottom: 24px; font-style: italic;">Rate each item from 0 (not present) to 5 (severe)</p>
+      
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="q1">Hallucinations</label>
+          <small style="color: #6b7280; display: block; margin-bottom: 8px;">How often do you hear or see things that others do not?</small>
+          <input type="number" name="q1" step="0.1" min="0" max="5" placeholder="0-5">
+        </div>
+        
+        <div class="form-group">
+          <label for="q2">Delusions</label>
+          <small style="color: #6b7280; display: block; margin-bottom: 8px;">How often do you feel people are watching you or plotting against you?</small>
+          <input type="number" name="q2" step="0.1" min="0" max="5" placeholder="0-5">
+        </div>
+        
+        <div class="form-group">
+          <label for="q3">Thought Control</label>
+          <small style="color: #6b7280; display: block; margin-bottom: 8px;">Do you feel your thoughts are being controlled by external forces?</small>
+          <input type="number" name="q3" step="0.1" min="0" max="5" placeholder="0-5">
+        </div>
+        
+        <div class="form-group">
+          <label for="q4">Communication Difficulty</label>
+          <small style="color: #6b7280; display: block; margin-bottom: 8px;">How difficult is it to communicate your thoughts clearly?</small>
+          <input type="number" name="q4" step="0.1" min="0" max="5" placeholder="0-5">
+        </div>
+      </div>
+    </div>
+    
+    <div style="text-align: center; margin-top: 40px;">
+      <button type="submit" class="button" style="padding: 16px 32px; font-size: 16px;">
+        🔬 Analyze Assessment
+      </button>
+    </div>
+  </form>
+  
+  {% if prediction %}
+  <div class="result" style="margin-top: 32px; padding: 24px; border-radius: 12px; text-align: center; font-size: 1.1rem;">
+    <h3 style="margin-bottom: 16px; color: #374151;">Assessment Result</h3>
+    <div style="font-weight: 600; font-size: 1.2rem;">{{ prediction }}</div>
+    <p style="margin-top: 16px; color: #6b7280; font-size: 0.9rem;">
+      <em>This is a screening tool only. Please consult with a healthcare professional for proper diagnosis and treatment.</em>
+    </p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

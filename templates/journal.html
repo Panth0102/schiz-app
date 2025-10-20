@@ -1,0 +1,18 @@
+{% extends "layout.html" %}
+{% block title %}Journal{% endblock %}
+{% block content %}
+<div class="container journal-container">
+    <h2 class="journal-title">Symptom Journal</h2>
+    <form method="post" class="journal-form">
+        <textarea name="entry" rows="4" class="journal-textarea" placeholder="Write about your day, symptoms, or mood..." required></textarea><br>
+        <button type="submit" class="journal-save">Save Entry</button>
+    </form>
+    <hr>
+    <h3>Previous Entries</h3>
+    <div class="journal-entries">
+        {% for e in entries %}
+            <div class="journal-entry">{{ e }}</div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

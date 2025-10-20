@@ -1,0 +1,68 @@
+{% extends "layout.html" %}
+{% block title %}Chatbot{% endblock %}
+{% block content %}
+<div class="container chatbot-container {{ mood }}">
+    <h2 class="chatbot-title">Symptom Support Chatbot</h2>
+    <form method="post">
+        <label for="mood">Select Mood:</label>
+        <select name="mood" onchange="this.form.submit()">
+            <option value="neutral" {% if mood=='neutral' %}selected{% endif %}>Neutral</option>
+            <option value="happy" {% if mood=='happy' %}selected{% endif %}>Happy</option>
+            <option value="sad" {% if mood=='sad' %}selected{% endif %}>Sad</option>
+            <option value="angry" {% if mood=='angry' %}selected{% endif %}>Angry</option>
+            <option value="overjoyed" {% if mood=='overjoyed' %}selected{% endif %}>Overjoyed</option>
+            <option value="depressed" {% if mood=='depressed' %}selected{% endif %}>Depressed</option>
+        </select>
+    </form>
+
+    <div id="chat-box" class="chat-box">
+        {% for sender, text in history %}
+        <div class="chat-message {{ sender|lower }}">
+            <strong>{{ sender }}:</strong> {{ text }}
+        </div>
+        {% endfor %}
+    </div>
+    <form method="post" class="chat-form">
+        <textarea name="message" rows="3" class="chat-input" placeholder="Type your message..." required></textarea><br>
+        <button type="submit" class="chat-send">Send</button>
+    </form>
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const textarea = document.querySelector(".chat-input");
+        const form = document.querySelector(".chat-form");
+
+        textarea.addEventListener("keydown", function (e) {
+            if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault(); // stop line break
+                form.submit();      // submit the form
+            }
+            // if Shift+Enter, default behavior allows new line
+        });
+
+        // auto-scroll to bottom
+        var chatBox = document.getElementById("chat-box");
+        chatBox.scrollTop = chatBox.scrollHeight;
+    });
+    document.addEventListener("DOMContentLoaded", function () {
+        const textarea = document.querySelector(".chat-input");
+        const form = document.querySelector(".chat-form");
+
+        textarea.addEventListener("keydown", function (e) {
+            if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                form.submit();
+                setTimeout(() => {
+                    textarea.focus(); // refocus after short delay
+                }, 100);
+            }
+        });
+
+        var chatBox = document.getElementById("chat-box");
+        chatBox.scrollTop = chatBox.scrollHeight;
+        textarea.focus(); // focus once on page load
+    });
+
+</script>
+
+{% endblock %}

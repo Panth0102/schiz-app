@@ -1,0 +1,8 @@
+Flask==2.3.3
+joblib==1.3.2
+numpy==1.24.3
+chatterbot==1.0.8
+chatterbot-corpus==1.2.0
+xhtml2pdf==0.2.11
+scikit-learn==1.3.0
+Werkzeug==2.3.7

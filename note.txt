@@ -1,0 +1,27 @@
+Your COBRE dataset (from schizophrenia research) uses these columns:
+
+SAPS stands for Scale for the Assessment of Positive Symptoms
+It is a standardized clinical scale in psychiatry
+used to measure the severity of positive symptoms of schizophrenia
+positive symptoms include things like hallucinations, delusions, bizarre behavior, disorganized speech
+In your data:
+
+saps7 → usually refers to the score on SAPS item 7 (for example, hallucinations or a specific positive symptom — the precise symptom depends on the study’s coding manual).
+saps20 → similarly, item 20 of the SAPS scale
+saps25 → item 25
+saps34 → item 34
+In many datasets, these numbers correspond to specific questions or subscales in the SAPS questionnaire:
+
+for example:
+SAPS item 7 might measure auditory hallucinations
+SAPS item 20 might measure delusions of reference
+SAPS item 25 might measure thought broadcasting
+SAPS item 34 might measure bizarre behavior
+However the exact definition of each item is given in the SAPS rating manual, which the COBRE study references in its methodology. If you want to look up exact symptom mapping, you’d refer to the COBRE documentation or the SAPS instrument itself.
+
+✅ In summary
+
+SAPS = positive symptom assessment
+Each number = a different question/subscale
+Higher scores = worse/more severe positive symptoms
+That’s why they make good features for a schizophrenia classifier.

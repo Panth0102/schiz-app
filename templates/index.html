@@ -1,0 +1,47 @@
+{% extends "layout.html" %}
+{% block title %}Home - MindCare{% endblock %}
+{% block content %}
+<div class="hero-section" style="text-align: center; margin-bottom: 60px;">
+    <h1 style="font-size: 3.5rem; font-weight: 700; margin-bottom: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+        MindCare
+    </h1>
+    <p style="font-size: 1.3rem; color: #6b7280; max-width: 600px; margin: 0 auto; line-height: 1.6;">
+        Your comprehensive mental health companion. Track symptoms, get insights, and maintain your wellbeing with AI-powered tools.
+    </p>
+</div>
+
+<div class="card-grid">
+    <div class="card">
+        <div style="font-size: 3rem; margin-bottom: 20px;">🧠</div>
+        <h3 style="color: #374151; margin-bottom: 16px; font-weight: 600;">Clinical Assessment</h3>
+        <p style="color: #6b7280; line-height: 1.6; margin-bottom: 24px;">
+            Advanced machine learning analysis based on validated clinical scales (SAPS) to provide insights into mental health patterns.
+        </p>
+        <a href="/predict" class="button">Start Assessment</a>
+    </div>
+    <div class="card">
+        <div style="font-size: 3rem; margin-bottom: 20px;">💬</div>
+        <h3 style="color: #374151; margin-bottom: 16px; font-weight: 600;">AI Support Chat</h3>
+        <p style="color: #6b7280; line-height: 1.6; margin-bottom: 24px;">
+            24/7 conversational support to help you process thoughts, track mood changes, and receive guidance.
+        </p>
+        <a href="/chatbot" class="button">Chat Now</a>
+    </div>
+    <div class="card">
+        <div style="font-size: 3rem; margin-bottom: 20px;">📝</div>
+        <h3 style="color: #374151; margin-bottom: 16px; font-weight: 600;">Personal Journal</h3>
+        <p style="color: #6b7280; line-height: 1.6; margin-bottom: 24px;">
+            Private space to document your daily experiences, emotions, and progress on your mental health journey.
+        </p>
+        <a href="/journal" class="button">Write Entry</a>
+    </div>
+</div>
+
+<div style="text-align: center; margin-top: 50px; padding: 30px; background: rgba(102, 126, 234, 0.1); border-radius: 16px;">
+    <h3 style="color: #374151; margin-bottom: 16px;">Session Summary</h3>
+    <p style="color: #6b7280; margin-bottom: 24px;">Download a comprehensive report of your session including assessments, conversations, and journal entries.</p>
+    <a href="{{ url_for('download_session') }}" class="button" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);">
+        📄 Download Report
+    </a>
+</div>
+{% endblock %}

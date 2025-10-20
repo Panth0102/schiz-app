@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}MindCare - Mental Health Support{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <style>
+    .logo {
+      max-height: 45px;
+      filter: brightness(0) saturate(100%) invert(27%) sepia(51%) saturate(2878%) hue-rotate(346deg) brightness(104%) contrast(97%);
+    }
+    
+    #darkModeToggle {
+      background: none;
+      border: 2px solid #4a5568;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    #darkModeToggle:hover {
+      background-color: #667eea;
+      border-color: #667eea;
+      transform: scale(1.1);
+    }
+    
+    body.dark-mode #darkModeToggle {
+      border-color: #e2e8f0;
+      color: #e2e8f0;
+    }
+  </style>
+</head>
+
+<body>
+  <nav>
+    <div class="nav-left">
+      <a href="/">Home</a>
+    </div>
+    <div class="nav-center">
+      <a href="/">
+        <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo" class="logo">
+      </a>
+    </div>
+    <div class="nav-right">
+      <a href="/about">About</a>
+      <button id="darkModeToggle" style="margin-left:10px;">🌙</button>
+    </div>
+  </nav>
+  <div class="container">
+    {% block content %}{% endblock %}
+  </div>
+
+  <script>
+    const toggle = document.getElementById("darkModeToggle");
+    toggle.addEventListener("click", () => {
+      document.body.classList.toggle("dark-mode");
+      if (document.body.classList.contains("dark-mode")) {
+        localStorage.setItem("darkMode", "enabled");
+      } else {
+        localStorage.setItem("darkMode", "disabled");
+      }
+    });
+    if (localStorage.getItem("darkMode") === "enabled") {
+      document.body.classList.add("dark-mode");
+    }
+  </script>
+
+
+</body>
+
+</html>

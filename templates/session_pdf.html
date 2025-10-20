@@ -1,0 +1,36 @@
+{% extends "layout.html" %}
+{% block title %}Session Report{% endblock %}
+{% block content %}
+<div class="container" style="max-width: 800px; margin: auto;">
+    <h2 style="text-align:center;">📝 Session Report</h2>
+
+    <div class="section">
+        <h3>🧠 Prediction Result</h3>
+        <p>{{ prediction }}</p>
+    </div>
+
+    <div class="section">
+        <h3>📓 Journal Entries</h3>
+        {% if journal %}
+            {% for e in journal %}
+                <div class="entry" style="border-bottom:1px solid #ccc; padding:4px 0;">{{ e }}</div>
+            {% endfor %}
+        {% else %}
+            <p>No journal entries recorded yet.</p>
+        {% endif %}
+    </div>
+
+    <div class="section">
+        <h3>💬 Chatbot Conversation</h3>
+        {% if chat_history %}
+            {% for sender, text in chat_history %}
+                <div class="message" style="margin-bottom:4px;">
+                    <strong>{{ sender }}:</strong> {{ text }}
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>No chatbot conversation recorded yet.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
