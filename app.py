@@ -1,8 +1,8 @@
 from flask import Flask, render_template, request, session, make_response
 import joblib
 import numpy as np
-from chatterbot import ChatBot
-from chatterbot.trainers import ChatterBotCorpusTrainer
+# Simple chatbot responses instead of ChatterBot
+import random
 from xhtml2pdf import pisa
 from io import BytesIO
 
@@ -10,13 +10,30 @@ app = Flask(__name__)
 app.secret_key = "my_super_secret_key"
 
 # Load trained ML model and scaler
-model = joblib.load("schiz_model.pkl")
-scaler = joblib.load("scaler.pkl")
+try:
+    model = joblib.load("schiz_model.pkl")
+    scaler = joblib.load("scaler.pkl")
+    print("Models loaded successfully")
+except Exception as e:
+    print(f"Error loading models: {e}")
+    model = None
+    scaler = None
 
-# Initialize ChatterBot
-schizo_bot = ChatBot("SchizoBot")
-trainer = ChatterBotCorpusTrainer(schizo_bot)
-trainer.train("chatterbot.corpus.english")
+# Simple chatbot responses
+def get_bot_response(user_input):
+    responses = [
+        "I understand how you're feeling. Can you tell me more about that?",
+        "That sounds challenging. How are you coping with this?",
+        "Thank you for sharing. What emotions are you experiencing right now?",
+        "I'm here to listen. How has your day been overall?",
+        "It's important to acknowledge these feelings. Have you noticed any patterns?",
+        "Your feelings are valid. What helps you feel better in these moments?",
+        "I appreciate you opening up. How can I support you today?",
+        "That's a lot to process. What would be most helpful right now?",
+        "I hear you. Have you been able to talk to anyone else about this?",
+        "Thank you for trusting me with this. How are you taking care of yourself?"
+    ]
+    return random.choice(responses)
 
 # ----------------
 # Home Page
@@ -40,19 +57,22 @@ def predict():
     prediction = None
     if request.method == "POST":
         try:
-            age = float(request.form["age"])
-            yrschool = int(request.form["yrschool"])
-            gender = int(request.form["gender"])
-            q1 = float(request.form["q1"])
-            q2 = float(request.form["q2"])
-            q3 = float(request.form["q3"])
-            q4 = float(request.form["q4"])
+            if model is None or scaler is None:
+                prediction = "Model not available. Please contact administrator."
+            else:
+                age = float(request.form["age"])
+                yrschool = int(request.form["yrschool"])
+                gender = int(request.form["gender"])
+                q1 = float(request.form["q1"])
+                q2 = float(request.form["q2"])
+                q3 = float(request.form["q3"])
+                q4 = float(request.form["q4"])
 
-            features = np.array([[age, yrschool, gender, q1, q2, q3, q4]])
-            features_scaled = scaler.transform(features)
-            pred = model.predict(features_scaled)[0]
-            prediction = "Schizophrenia" if pred == 1 else "Sibling (no schizophrenia)"
-            session["prediction"] = prediction
+                features = np.array([[age, yrschool, gender, q1, q2, q3, q4]])
+                features_scaled = scaler.transform(features)
+                pred = model.predict(features_scaled)[0]
+                prediction = "Schizophrenia" if pred == 1 else "Sibling (no schizophrenia)"
+                session["prediction"] = prediction
         except Exception as e:
             prediction = f"Error: {str(e)}"
 
@@ -78,9 +98,9 @@ def chatbot():
             session["mood"] = mood
         else:
             user_input = request.form["message"]
-            bot_response = schizo_bot.get_response(user_input)
+            bot_response = get_bot_response(user_input)
             session["chat_history"].append(("You", user_input))
-            session["chat_history"].append(("Bot", str(bot_response)))
+            session["chat_history"].append(("Bot", bot_response))
             session.modified = True
 
     return render_template("chatbot.html", history=session["chat_history"], mood=mood)
