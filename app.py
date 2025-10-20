@@ -1,13 +1,13 @@
 from flask import Flask, render_template, request, session, make_response
 import joblib
 import numpy as np
+import os
 # Simple chatbot responses instead of ChatterBot
 import random
-from xhtml2pdf import pisa
-from io import BytesIO
+# Removed PDF dependencies for now
 
 app = Flask(__name__)
-app.secret_key = "my_super_secret_key"
+app.secret_key = os.environ.get('SECRET_KEY', 'panth_sutaria_8320829286_psmsssks')
 
 # Load trained ML model and scaler
 try:
@@ -34,6 +34,13 @@ def get_bot_response(user_input):
         "Thank you for trusting me with this. How are you taking care of yourself?"
     ]
     return random.choice(responses)
+
+# ----------------
+# Health Check
+# ----------------
+@app.route("/health")
+def health():
+    return {"status": "healthy", "models_loaded": model is not None}
 
 # ----------------
 # Home Page
@@ -122,39 +129,45 @@ def journal():
     return render_template("journal.html", entries=session["journal"])
 
 # ----------------
-# Session PDF Download
+# Session Summary (Text version)
 # ----------------
 @app.route("/session/download")
 def download_session():
     journal = session.get("journal", [])
     chat_history = session.get("chat_history", [])
     prediction = session.get("prediction", "No prediction made yet")
+    
+    # Create a simple text summary
+    summary = f"""
+SESSION SUMMARY
+===============
 
-    html = render_template(
-        "session_pdf.html",
-        journal=journal,
-        chat_history=chat_history,
-        prediction=prediction
-    )
+PREDICTION RESULT:
+{prediction}
 
-    pdf = BytesIO()
-    pisa_status = pisa.CreatePDF(html, dest=pdf)
-
-    if pisa_status.err:
-        return "Error generating PDF", 500
-
-    response = make_response(pdf.getvalue())
-    response.headers["Content-Type"] = "application/pdf"
-    response.headers["Content-Disposition"] = "attachment; filename=session_report.pdf"
+JOURNAL ENTRIES ({len(journal)} entries):
+"""
+    for i, entry in enumerate(journal, 1):
+        summary += f"{i}. {entry}\n"
+    
+    summary += f"\nCHAT HISTORY ({len(chat_history)} messages):\n"
+    for speaker, message in chat_history:
+        summary += f"{speaker}: {message}\n"
+    
+    response = make_response(summary)
+    response.headers["Content-Type"] = "text/plain"
+    response.headers["Content-Disposition"] = "attachment; filename=session_report.txt"
     return response
 
 # ----------------
 # Run the app
 # ----------------
+import os
+
 if __name__ == "__main__":
-    import os
     port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port, debug=False)
+    debug_mode = os.environ.get('FLASK_ENV') == 'development'
+    app.run(host='0.0.0.0', port=port, debug=debug_mode)
 
 
 
