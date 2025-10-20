@@ -45,16 +45,22 @@
 <body>
   <nav>
     <div class="nav-left">
-      <a href="/">Home</a>
-    </div>
-    <div class="nav-center">
-      <a href="/">
-        <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo" class="logo">
+      <a href="/" class="logo-link">
+        <img src="{{ url_for('static', filename='img/P.png') }}" alt="MindCare Logo" class="logo">
+        <span class="brand-name">MindCare</span>
       </a>
     </div>
+    <div class="nav-center">
+      <div class="nav-links">
+        <a href="/">Home</a>
+        <a href="/predict">Assessment</a>
+        <a href="/chatbot">Chat Support</a>
+        <a href="/journal">Journal</a>
+        <a href="/about">About</a>
+      </div>
+    </div>
     <div class="nav-right">
-      <a href="/about">About</a>
-      <button id="darkModeToggle" style="margin-left:10px;">🌙</button>
+      <button id="darkModeToggle">🌙</button>
     </div>
   </nav>
   <div class="container">
